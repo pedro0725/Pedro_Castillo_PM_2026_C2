@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+/* Lectura de datos formateados y calculo de promedio. */
+
+void main(void)
+{
+    int matricula, cont = 0;
+    char nombre[30];
+    float promedio, suma = 0.0;
+    FILE *ar;
+    
+    if ((ar = fopen("alumnos.txt", "r")) != NULL)
+    {
+        printf("Matricula\tNombre\t\tPromedio\n");
+        printf("-----------------------------------------\n");
+        
+        /* Lee datos estructurados de forma secuencial */
+        while (fscanf(ar, "%d\t%[^\t]\t%f\n", &matricula, nombre, &promedio) != EOF)
+        {
+            printf("%d\t%-15s\t%.2f\n", matricula, nombre, promedio);
+            suma += promedio;
+            cont++;
+        }
+        fclose(ar);
+        
+        if (cont > 0)
+        {
+            printf("\nPromedio general del grupo: %.2f", (suma / cont));
+        }
+        else
+        {
+            printf("\nNo se encontraron registros de alumnos.");
+        }
+    }
+    else
+    {
+        printf("\nError al abrir el archivo.");
+    }
+}
