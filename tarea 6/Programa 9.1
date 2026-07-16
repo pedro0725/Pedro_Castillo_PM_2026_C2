@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+/* Escritura de caracteres en un archivo de texto. */
+
+void main(void)
+{
+    char p;
+    FILE *ar;
+    
+    /* Se abre el archivo en modo escritura "w" (write) */
+    if ((ar = fopen("caracteres.txt", "w")) != NULL)
+    {
+        printf("Ingrese texto para guardar en el archivo (presione Enter para terminar):\n");
+        while ((p = getchar()) != '\n')
+        {
+            fputc(p, ar); /* Escribe el caracter 'p' en el archivo apuntado por 'ar' */
+        }
+        fclose(ar); /* Siempre es crucial cerrar el archivo */
+        printf("\nArchivo creado exitosamente.");
+    }
+    else
+    {
+        printf("\nNo se pudo abrir el archivo.");
+    }
+}
