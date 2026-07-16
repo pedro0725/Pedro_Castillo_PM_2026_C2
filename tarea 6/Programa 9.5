@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+/* Copia de archivos linea por linea empleando fgets y fputs. */
+
+void main(void)
+{
+    char linea[100];
+    FILE *origen, *destino;
+    
+    if ((origen = fopen("alumnos.txt", "r")) != NULL)
+    {
+        if ((destino = fopen("respaldo_alumnos.txt", "w")) != NULL)
+        {
+            /* Lee una linea completa del archivo de origen hasta un salto de linea o EOF */
+            while (fgets(linea, 100, origen) != NULL)
+            {
+                fputs(linea, destino); /* Escribe la linea en el archivo de destino */
+            }
+            fclose(destino);
+            printf("\nRespaldo generado exitosamente.");
+        }
+        else
+        {
+            printf("\nNo se pudo crear el archivo de respaldo.");
+        }
+        fclose(origen);
+    }
+    else
+    {
+        printf("\nEl archivo de origen no existe.");
+    }
+}
