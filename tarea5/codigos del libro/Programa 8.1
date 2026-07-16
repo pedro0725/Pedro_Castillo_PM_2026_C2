@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <string.h>
+
+/* Estructuras-1.
+   El programa muestra la declaración de una estructura, así como la asignación
+   y lectura de sus campos. */
+
+struct alumno {
+    int matricula;
+    char nombre[20];
+    char carrera[20];
+    float promedio;
+};
+
+void main(void)
+{
+    struct alumno alu1, alu2;
+    
+    /* Asignación directa de datos al alumno 1 */
+    alu1.matricula = 12450;
+    strcpy(alu1.nombre, "Juan Perez");
+    strcpy(alu1.carrera, "Computacion");
+    alu1.promedio = 8.5;
+    
+    /* Lectura de datos para el alumno 2 desde teclado */
+    printf("Ingrese la matricula del alumno 2: ");
+    scanf("%d", &alu2.matricula);
+    fflush(stdin); /* Limpieza del buffer */
+    
+    printf("Ingrese el nombre del alumno 2: ");
+    gets(alu2.nombre);
+    
+    printf("Ingrese la carrera del alumno 2: ");
+    gets(alu2.carrera);
+    
+    printf("Ingrese el promedio del alumno 2: ");
+    scanf("%f", &alu2.promedio);
+    
+    /* Impresión de resultados */
+    printf("\nDatos del Alumno 1:");
+    printf("\nMatricula: %d \t Nombre: %s \t Carrera: %s \t Promedio: %.2f", 
+           alu1.matricula, alu1.nombre, alu1.carrera, alu1.promedio);
+           
+    printf("\n\nDatos del Alumno 2:");
+    printf("\nMatricula: %d \t Nombre: %s \t Carrera: %s \t Promedio: %.2f", 
+           alu2.matricula, alu2.nombre, alu2.carrera, alu2.promedio);
+}
