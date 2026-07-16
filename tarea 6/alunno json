@@ -1,0 +1,17 @@
+{
+    "alumnos": [
+        {
+            "Nombre": "Pedro",
+            "Apellido": "Castillo",
+            "Promedio": 9.2,
+            "Materia": "Estructuras de Datos"
+        },
+        {
+            "Nombre": "María",
+            "Apellido": "González",
+            "Promedio": 8.5,
+            "Materia": "Fundamentos de Programación"
+        },
+        ...
+    ]
+}
