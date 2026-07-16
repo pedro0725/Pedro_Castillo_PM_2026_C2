@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Definición de la estructura Alumno */
+typedef struct {
+    char nombre[50];
+    char apellido[50];
+    float promedio;
+    char materia[100];
+} Alumno;
+
+/* Prototipos de funciones */
+int contar_elementos(const char *nombre_archivo);
+void cargar_datos(const char *nombre_archivo, Alumno *arreglo, int n);
+void imprimir_alumnos(Alumno *arreglo, int n);
+
+int main() {
+    const char *nombre_archivo = "alumnos.xml";
+    int n = 0;
+    Alumno *alumnos = NULL;
+
+    /* 1. Contar elementos en el archivo */
+    n = contar_elementos(nombre_archivo);
+    if (n <= 0) {
+        printf("No se encontraron alumnos en el archivo o el archivo no existe.\n");
+        return 1;
+    }
+
+    printf("Se detectaron %d alumnos en el archivo XML.\n", n);
+    printf("Reservando memoria dinamicamente...\n\n");
+
+    /* 2. Asignar memoria de manera dinámica */
+    alumnos = (Alumno *) malloc(n * sizeof(Alumno));
+    if (alumnos == NULL) {
+        printf("Error: No se pudo asignar memoria.\n");
+        return 1;
+    }
+
+    /* 3. Cargar los datos en el arreglo dinámico */
+    cargar_datos(nombre_archivo, alumnos, n);
+
+    /* 4. Imprimir la información en pantalla */
+    imprimir_alumnos(alumnos, n);
+
+    /* 5. Liberar la memoria asignada */
+    free(alumnos);
+    printf("Memoria liberada correctamente.\n");
+
+    return 0;
+}
+
+/* Función para contar la cantidad de etiquetas <alumno> en el archivo */
+int contar_elementos(const char *nombre_archivo) {
+    FILE *f = fopen(nombre_archivo, "r");
+    if (f == NULL) return -1;
+
+    char linea[256];
+    int contador = 0;
+
+    while (fgets(linea, sizeof(linea), f) != NULL) {
+        /* Busca la coincidencia de la etiqueta de apertura */
+        if (strstr(linea, "<alumno>") != NULL) {
+            contador++;
+        }
+    }
+
+    fclose(f);
+    return contador;
+}
+
+/* Función para extraer el contenido entre etiquetas XML simples */
+void extraer_campo(const char *linea, const char *etiqueta_ap, const char *etiqueta_cr, char *destino) {
+    char *inicio = strstr(linea, etiqueta_ap);
+    char *fin = strstr(linea, etiqueta_cr);
+    
+    if (inicio != NULL && fin != NULL) {
+        inicio += strlen(etiqueta_ap); /* Mover el puntero al inicio del valor */
+        int longitud = fin - inicio;
+        strncpy(destino, inicio, longitud);
+        destino[longitud] = '\0'; /* Añadir fin de cadena */
+    }
+}
+
+/* Función para leer y cargar los datos estructurados en el arreglo */
+void cargar_datos(const char *nombre_archivo, Alumno *arreglo, int n) {
+    FILE *f = fopen(nombre_archivo, "r");
+    if (f == NULL) return;
+
+    char linea[256];
+    int i = -1;
+    char aux_promedio[20];
+
+    while (fgets(linea, sizeof(linea), f) != NULL) {
+        /* Al detectar un nuevo alumno, avanzamos el índice del arreglo */
+        if (strstr(linea, "<alumno>") != NULL) {
+            i++;
+            continue;
+        }
+
+        if (i >= 0 && i < n) {
+            if (strstr(linea, "<nombre>") != NULL) {
+                extraer_campo(linea, "<nombre>", "</nombre>", arreglo[i].nombre);
+            }
+            else if (strstr(linea, "<apellido>") != NULL) {
+                extraer_campo(linea, "<apellido>", "</apellido>", arreglo[i].apellido);
+            }
+            else if (strstr(linea, "<promedio>") != NULL) {
+                extraer_campo(linea, "<promedio>", "</promedio>", aux_promedio);
+                arreglo[i].promedio = atof(aux_promedio); /* Convertir texto a flotante */
+            }
+            else if (strstr(linea, "<materia>") != NULL) {
+                extraer_campo(linea, "<materia>", "</materia>", arreglo[i].materia);
+            }
+        }
+    }
+
+    fclose(f);
+}
+
+/* Función para imprimir los registros cargados */
+void imprimir_alumnos(Alumno *arreglo, int n) {
+    printf("========================================================================\n");
+    printf("%-15s %-15s %-10s %-30s\n", "Nombre", "Apellido", "Promedio", "Materia");
+    printf("========================================================================\n");
+    for (int i = 0; i < n; i++) {
+        printf("%-15s %-15s %-10.2f %-30s\n", 
+               arreglo[i].nombre, 
+               arreglo[i].apellido, 
+               arreglo[i].promedio, 
+               arreglo[i].materia);
+    }
+    printf("========================================================================\n\n");
+}
