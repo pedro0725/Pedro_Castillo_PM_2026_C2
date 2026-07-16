@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Firmas magicas conocidas */
+const unsigned char FIRMA_PNG[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+const unsigned char FIRMA_JPG[] = {0xFF, 0xD8, 0xFF};
+const unsigned char FIRMA_BMP[] = {0x42, 0x4D}; // Equivale a caracteres "BM"
+
+void validar_archivo(const char *ruta) {
+    FILE *archivo = fopen(ruta, "rb");
+    if (!archivo) {
+        printf("Error: No se pudo abrir o no existe el archivo '%s'.\n", ruta);
+        return;
+    }
+
+    // Leer los primeros 8 bytes
+    unsigned char cabecera[8];
+    size_t bytes_leidos = fread(cabecera, 1, 8, archivo);
+    fclose(archivo);
+
+    if (bytes_leidos < 2) {
+        printf("El archivo es demasiado pequeño para ser una imagen valida.\n");
+        return;
+    }
+
+    // Obtener la extension escrita por el usuario
+    char *ext = strrchr(ruta, '.');
+    if (!ext) {
+        printf("El archivo no tiene ninguna extension en su nombre.\n");
+        return;
+    }
+
+    printf("\n--- Analizando: %s ---\n", ruta);
+
+    /* 1. Verificar si coincide internamente con un PNG */
+    if (bytes_leidos >= 8 && memcmp(cabecera, FIRMA_PNG, 8) == 0) {
+        printf("Contenido detectado: [PNG Genuino]\n");
+        if (strcasecmp(ext, ".png") == 0) {
+            printf(">> RESULTADO: VALIDO. Coincide contenido y extension.\n");
+        } else {
+            printf(">> RESULTADO: INCONSISTENCIA. El contenido es PNG pero tiene extension '%s'.\n", ext);
+        }
+    }
+    /* 2. Verificar si coincide internamente con un JPG */
+    else if (bytes_leidos >= 3 && memcmp(cabecera, FIRMA_JPG, 3) == 0) {
+        printf("Contenido detectado: [JPEG/JPG Genuino]\n");
+        if (strcasecmp(ext, ".jpg") == 0 || strcasecmp(ext, ".jpeg") == 0) {
+            printf(">> RESULTADO: VALIDO. Coincide contenido y extension.\n");
+        } else {
+            printf(">> RESULTADO: INCONSISTENCIA. El contenido es JPG pero tiene extension '%s'.\n", ext);
+        }
+    }
+    /* 3. Verificar si coincide internamente con un BMP */
+    else if (bytes_leidos >= 2 && memcmp(cabecera, FIRMA_BMP, 2) == 0) {
+        printf("Contenido detectado: [BMP Genuino]\n");
+        if (strcasecmp(ext, ".bmp") == 0) {
+            printf(">> RESULTADO: VALIDO. Coincide contenido y extension.\n");
+        } else {
+            printf(">> RESULTADO: INCONSISTENCIA. El contenido es BMP pero tiene extension '%s'.\n", ext);
+        }
+    }
+    /* 4. No coincide con firmas conocidas */
+    else {
+        printf("Contenido detectado: [Desconocido / No es imagen compatible]\n");
+        printf(">> RESULTADO: INVALIDO. El contenido interno no corresponde a un grafico PNG, JPG o BMP.\n");
+    }
+}
+
+int main() {
+    char ruta[256];
+    printf("Ingrese el nombre del archivo a comprobar (ejemplo: foto.png): ");
+    scanf("%255s", ruta);
+
+    validar_archivo(ruta);
+
+    return 0;
+}
