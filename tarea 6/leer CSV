@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char nombre[50];
+    char apellido[50];
+    float promedio;
+    char materia[100];
+} Alumno;
+
+int contar_elementos_csv(const char *nombre_archivo);
+void cargar_datos_csv(const char *nombre_archivo, Alumno *arreglo, int n);
+void imprimir_alumnos(Alumno *arreglo, int n);
+
+int main() {
+    const char *nombre_archivo = "alumnos.csv";
+    int n = contar_elementos_csv(nombre_archivo);
+
+    if (n <= 0) {
+        printf("No se encontraron alumnos en el archivo CSV o el archivo no existe.\n");
+        return 1;
+    }
+
+    printf("Se detectaron %d alumnos en el archivo CSV.\n", n);
+    
+    Alumno *alumnos = (Alumno *) malloc(n * sizeof(Alumno));
+    if (alumnos == NULL) {
+        printf("Error de asignacion de memoria.\n");
+        return 1;
+    }
+
+    cargar_datos_csv(nombre_archivo, alumnos, n);
+    imprimir_alumnos(alumnos, n);
+
+    free(alumnos);
+    return 0;
+}
+
+/* Cuenta las lineas del archivo restando 1 (la cabecera) */
+int contar_elementos_csv(const char *nombre_archivo) {
+    FILE *f = fopen(nombre_archivo, "r");
+    if (f == NULL) return -1;
+
+    char linea[256];
+    int lineas = 0;
+
+    while (fgets(linea, sizeof(linea), f) != NULL) {
+        lineas++;
+    }
+    fclose(f);
+    
+    return (lineas > 0) ? (lineas - 1) : 0; /* Restar cabecera */
+}
+
+void cargar_datos_csv(const char *nombre_archivo, Alumno *arreglo, int n) {
+    FILE *f = fopen(nombre_archivo, "r");
+    if (f == NULL) return;
+
+    char linea[256];
+    int i = 0;
+
+    /* Omitir la primera linea de cabecera */
+    if (fgets(linea, sizeof(linea), f) == NULL) {
+        fclose(f);
+        return;
+    }
+
+    while (fgets(linea, sizeof(linea), f) != NULL && i < n) {
+        /* Remover el salto de linea al final para evitar problemas */
+        linea[strcspn(linea, "\r\n")] = 0;
+
+        /* Obtener el primer token: Nombre */
+        char *token = strtok(linea, ",");
+        if (token != NULL) strcpy(arreglo[i].nombre, token);
+
+        /* Obtener el segundo token: Apellido */
+        token = strtok(NULL, ",");
+        if (token != NULL) strcpy(arreglo[i].apellido, token);
+
+        /* Obtener el tercer token: Promedio */
+        token = strtok(NULL, ",");
+        if (token != NULL) arreglo[i].promedio = atof(token);
+
+        /* Obtener el cuarto token: Materia */
+        token = strtok(NULL, ",");
+        if (token != NULL) strcpy(arreglo[i].materia, token);
+
+        i++;
+    }
+    fclose(f);
+}
+
+void imprimir_alumnos(Alumno *arreglo, int n) {
+    printf("========================================================================\n");
+    printf("%-15s %-15s %-10s %-30s\n", "Nombre", "Apellido", "Promedio", "Materia");
+    printf("========================================================================\n");
+    for (int i = 0; i < n; i++) {
+        printf("%-15s %-15s %-10.2f %-30s\n", 
+               arreglo[i].nombre, arreglo[i].apellido, arreglo[i].promedio, arreglo[i].materia);
+    }
+    printf("========================================================================\n\n");
+}
