@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+int main() {
+    int vec[100];
+    int n, i;
+    int palindromo = 1;
+
+    printf("Ingrese la cantidad de elementos: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("Elemento %d: ", i + 1);
+        scanf("%d", &vec[i]);
+    }
+
+    for (i = 0; i < n / 2; i++) {
+        if (vec[i] != vec[n - 1 - i]) {
+            palindromo = 0;
+            break;
+        }
+    }
+
+    if (palindromo)
+        printf("El arreglo es palindromo.\n");
+    else
+        printf("El arreglo NO es palindromo.\n");
+
+    return 0;
+}
