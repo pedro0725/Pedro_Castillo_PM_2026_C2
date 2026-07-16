@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+
+#pragma pack(push, 1)
+/* Cabecera del archivo BMP (14 bytes) */
+typedef struct {
+    unsigned short type;             /* Firma "BM" */
+    unsigned int   size;             /* Tamaño del archivo */
+    unsigned short reserved1;
+    unsigned short reserved2;
+    unsigned int   offset;           /* Inicio de los datos de imagen */
+} BMPHeader;
+
+/* Cabecera de información del BMP (40 bytes - DIB Header) */
+typedef struct {
+    unsigned int   size;             /* Tamaño de esta cabecera */
+    int            width;            /* Ancho de la imagen */
+    int            height;           /* Alto de la imagen */
+    unsigned short planes;           /* Planos de color (debe ser 1) */
+    unsigned short bits_per_pixel;   /* 24 bits para RGB */
+    unsigned int   compression;
+    unsigned int   image_size;
+    int            x_pixels_per_m;
+    int            y_pixels_per_m;
+    unsigned int   colors_used;
+    unsigned int   colors_important;
+} BMPInfoHeader;
+#pragma pack(pop)
+
+/* Prototipos de funciones */
+int listar_archivos_bmp(char lista[][256]);
+void convertir_a_gris(const char *nombre_archivo);
+
+int main() {
+    char archivos[50][256];
+    int total_archivos = 0;
+    int opcion;
+
+    while (1) {
+        printf("\n========================================\n");
+        printf("    CONVERSOR BMP A GRIS EN C\n");
+        printf("========================================\n");
+
+        total_archivos = listar_archivos_bmp(archivos);
+
+        if (total_archivos == 0) {
+            printf("No se encontraron archivos .bmp en la carpeta actual.\n");
+            break;
+        }
+
+        printf("Seleccione la imagen que desea convertir:\n");
+        for (int i = 0; i < total_archivos; i++) {
+            printf("%d. %s\n", i + 1, archivos[i]);
+        }
+        printf("0. Salir\n");
+        printf("\nSeleccion: ");
+        
+        if (scanf("%d", &opcion) != 1) {
+            printf("Entrada no valida.\n");
+            fflush(stdin);
+            continue;
+        }
+
+        if (opcion == 0) {
+            printf("Saliendo...\n");
+            break;
+        } else if (opcion > 0 && opcion <= total_archivos) {
+            printf("\nProcesando '%s'...\n", archivos[opcion - 1]);
+            convertir_a_gris(archivos[opcion - 1]);
+        } else {
+            printf("Opcion invalida.\n");
+        }
+    }
+
+    return 0;
+}
+
+/* Lista los archivos con extension .bmp en la carpeta de ejecucion */
+int listar_archivos_bmp(char lista[][256]) {
+    DIR *dir;
+    struct dirent *ent;
+    int contador = 0;
+
+    dir = opendir(".");
+    if (dir == NULL) {
+        printf("No se pudo abrir la carpeta actual.\n");
+        return 0;
+    }
+
+    while ((ent = readdir(dir)) != NULL) {
+        /* Comprobar si termina en .bmp o .BMP */
+        char *ext = strrchr(ent->d_name, '.');
+        if (ext != NULL && (strcasecmp(ext, ".bmp") == 0)) {
+            strcpy(lista[contador], ent->d_name);
+            contador++;
+            if (contador >= 50) break; /* Limite de archivos a listar */
+        }
+    }
+    closedir(dir);
+    return contador;
+}
+
+/* Algoritmo de conversion a escala de grises */
+void convertir_a_gris(const char *nombre_archivo) {
+    FILE *original = fopen(nombre_archivo, "rb");
+    if (!original) {
+        printf("Error al abrir el archivo original.\n");
+        return;
+    }
+
+    // Nombre del nuevo archivo
+    char nuevo_nombre[300];
+    sprintf(nuevo_nombre, "gris_%s", nombre_archivo);
+    FILE *copia = fopen(nuevo_nombre, "wb");
+    if (!copia) {
+        printf("Error al crear el archivo de destino.\n");
+        fclose(original);
+        return;
+    }
+
+    BMPHeader header;
+    BMPInfoHeader infoHeader;
+
+    // Leer cabeceras
+    fread(&header, sizeof(BMPHeader), 1, original);
+    fread(&infoHeader, sizeof(BMPInfoHeader), 1, original);
+
+    // Escribir cabeceras en el nuevo archivo
+    fwrite(&header, sizeof(BMPHeader), 1, copia);
+    fwrite(&infoHeader, sizeof(BMPInfoHeader), 1, copia);
+
+    // Validar si es un BMP de 24 bits (RGB sin compresion)
+    if (header.type != 0x4D42 || infoHeader.bits_per_pixel != 24) {
+        printf("Error: Solo se soportan archivos BMP de 24 bits sin comprimir.\n");
+        fclose(original);
+        fclose(copia);
+        remove(nuevo_nombre); // Eliminar archivo destino corrupto
+        return;
+    }
+
+    // Posicionarse al inicio de los pixeles de imagen
+    fseek(original, header.offset, SEEK_SET);
+    fseek(copia, header.offset, SEEK_SET);
+
+    // Los archivos BMP alinean las filas a multiplos de 4 bytes (padding)
+    int padding = (4 - (infoHeader.width * 3) % 4) % 4;
+    unsigned char pixel[3]; // Buffer para [Blue, Green, Red]
+    unsigned char pad_byte = 0;
+
+    for (int y = 0; y < abs(infoHeader.height); y++) {
+        for (int x = 0; x < infoHeader.width; x++) {
+            fread(pixel, 3, 1, original);
+
+            /* Formula de luminancia estandar (NTSC/ITU):
+               Gris = 0.299*R + 0.587*G + 0.114*B */
+            unsigned char gris = (unsigned char)(0.299 * pixel[2] + 0.587 * pixel[1] + 0.114 * pixel[0]);
+
+            // Asignar el mismo valor a los tres canales (R = G = B)
+            pixel[0] = gris; // B
+            pixel[1] = gris; // G
+            pixel[2] = gris; // R
+
+            fwrite(pixel, 3, 1, copia);
+        }
+        // Procesar bytes de relleno (padding)
+        for (int p = 0; p < padding; p++) {
+            fgetc(original);
+            fputc(pad_byte, copia);
+        }
+    }
+
+    printf("¡Imagen procesada con exito!\nGuardada como: %s\n", nuevo_nombre);
+
+    fclose(original);
+    fclose(copia);
+}
