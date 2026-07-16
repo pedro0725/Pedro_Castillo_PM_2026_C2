@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<alumnos>
+    <alumno>
+        <nombre>pedro</nombre>
+        <apellido>Castillo</apellido>
+        <promedio>9.2</promedio>
+        <materia>Estructuras de Datos</materia>
+    </alumno>
+    <alumno>
+        <nombre>María</nombre>
+        <apellido>Castillo</apellido>
+        <promedio>8.5</promedio>
+        <materia>Fundamentos de Programación</materia>
+    </alumno>
+    ...
+</alumnos>
