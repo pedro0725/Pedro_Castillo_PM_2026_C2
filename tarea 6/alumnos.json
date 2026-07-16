@@ -1,0 +1,64 @@
+{
+    "alumnos": [
+        {
+            "Nombre": "Carlos",
+            "Apellido": "Pérez",
+            "Promedio": 9.2,
+            "Materia": "Estructuras de Datos"
+        },
+        {
+            "Nombre": "María",
+            "Apellido": "González",
+            "Promedio": 8.5,
+            "Materia": "Fundamentos de Programación"
+        },
+        {
+            "Nombre": "Juan",
+            "Apellido": "Rodríguez",
+            "Promedio": 7.8,
+            "Materia": "Álgebra Lineal"
+        },
+        {
+            "Nombre": "Ana",
+            "Apellido": "Martínez",
+            "Promedio": 9.6,
+            "Materia": "Bases de Datos"
+        },
+        {
+            "Nombre": "Luis",
+            "Apellido": "Sánchez",
+            "Promedio": 8.0,
+            "Materia": "Sistemas Operativos"
+        },
+        {
+            "Nombre": "Laura",
+            "Apellido": "Gómez",
+            "Promedio": 9.9,
+            "Materia": "Análisis de Algoritmos"
+        },
+        {
+            "Nombre": "José",
+            "Apellido": "Fernández",
+            "Promedio": 7.2,
+            "Materia": "Fundamentos de Programación"
+        },
+        {
+            "Nombre": "Elena",
+            "Apellido": "Díaz",
+            "Promedio": 8.9,
+            "Materia": "Redes de Computadoras"
+        },
+        {
+            "Nombre": "Pedro",
+            "Apellido": "Álvarez",
+            "Promedio": 8.3,
+            "Materia": "Inteligencia Artificial"
+        },
+        {
+            "Nombre": "Sofía",
+            "Apellido": "Romero",
+            "Promedio": 9.4,
+            "Materia": "Desarrollo Web"
+        }
+    ]
+}
