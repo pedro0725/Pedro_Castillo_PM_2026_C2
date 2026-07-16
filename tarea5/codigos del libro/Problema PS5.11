@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main() {
+    long long perfectos[30];
+    int cantidad = 0;
+    long long num = 2;
+
+    while (cantidad < 30) {
+        long long suma = 1;
+
+        for (long long i = 2; i <= num / 2; i++) {
+            if (num % i == 0) {
+                suma += i;
+            }
+        }
+
+        if (suma == num) {
+            perfectos[cantidad] = num;
+            cantidad++;
+        }
+
+        num++;
+    }
+
+    printf("Primeros 30 numeros perfectos:\n");
+
+    for (int i = 0; i < 30; i++) {
+        printf("%lld\n", perfectos[i]);
+    }
+
+    return 0;
+}
