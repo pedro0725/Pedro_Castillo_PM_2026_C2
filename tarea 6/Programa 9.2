@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+/* Lectura de caracteres desde un archivo de texto. */
+
+void main(void)
+{
+    char p;
+    FILE *ar;
+    
+    /* Se abre el archivo en modo lectura "r" (read) */
+    if ((ar = fopen("caracteres.txt", "r")) != NULL)
+    {
+        printf("Contenido del archivo:\n");
+        /* Se lee caracter por caracter hasta llegar al final del archivo (EOF) */
+        while ((p = fgetc(ar)) != EOF)
+        {
+            putchar(p); /* Muestra el caracter en pantalla */
+        }
+        fclose(ar);
+    }
+    else
+    {
+        printf("\nNo se pudo abrir el archivo.");
+    }
+}
