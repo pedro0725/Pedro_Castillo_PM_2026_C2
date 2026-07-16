@@ -1,0 +1,40 @@
+#include <stdio.h>
+
+/* Escritura de datos con formato en un archivo de texto. */
+
+void main(void)
+{
+    int i, n, matricula;
+    char nombre[30];
+    float promedio;
+    FILE *ar;
+    
+    if ((ar = fopen("alumnos.txt", "w")) != NULL)
+    {
+        printf("Ingrese el numero de alumnos a registrar: ");
+        scanf("%d", &n);
+        
+        for (i = 0; i < n; i++)
+        {
+            printf("\nAlumno %d:", i + 1);
+            printf("\nMatricula: ");
+            scanf("%d", &matricula);
+            fflush(stdin); /* Limpieza de buffer */
+            
+            printf("Nombre: ");
+            gets(nombre);
+            
+            printf("Promedio: ");
+            scanf("%f", &promedio);
+            
+            /* Escribe los datos en el archivo con formato */
+            fprintf(ar, "%d\t%s\t%.2f\n", matricula, nombre, promedio);
+        }
+        fclose(ar);
+        printf("\nDatos guardados correctamente.");
+    }
+    else
+    {
+        printf("\nError al abrir el archivo.");
+    }
+}
