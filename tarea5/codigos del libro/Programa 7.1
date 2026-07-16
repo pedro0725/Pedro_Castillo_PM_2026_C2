@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+
+/* Cuenta vocales.
+   El programa, al recibir como dato una cadena de caracteres, 
+   cuenta el número de vocales que se encuentran en ella. */
+
+void main(void)
+{
+    char cad[50];
+    int i = 0, voc = 0;
+    
+    printf("Ingrese la cadena de caracteres: ");
+    gets(cad); /* Lectura de la cadena */
+    
+    while (cad[i] != '\0')
+    {
+        switch (cad[i])
+        {
+            case 'a':
+            case 'e':
+            case 'i':
+            case 'o':
+            case 'u':
+            case 'A':
+            case 'E':
+            case 'I':
+            case 'O':
+            case 'U': voc++; 
+                      break;
+        }
+        i++;
+    }
+    printf("\nNumero de vocales: %d", voc);
+}
