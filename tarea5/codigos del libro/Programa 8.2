@@ -1,0 +1,54 @@
+#include <stdio.h>
+
+/* Inventario de artículos usando arreglos de estructuras. */
+
+struct articulo {
+    int clave;
+    char descripcion[30];
+    float precio;
+    int existencia;
+};
+
+void main(void)
+{
+    struct articulo inventario[100];
+    int n, i;
+    float total_valor = 0.0;
+    
+    do {
+        printf("Ingrese el numero de articulos a registrar (1-100): ");
+        scanf("%d", &n);
+    } while (n < 1 || n > 100);
+    
+    /* Registro de artículos */
+    for (i = 0; i < n; i++)
+    {
+        printf("\nArticulo %d:", i + 1);
+        printf("\nClave: ");
+        scanf("%d", &inventario[i].clave);
+        fflush(stdin);
+        
+        printf("Descripcion: ");
+        gets(inventario[i].descripcion);
+        
+        printf("Precio: ");
+        scanf("%f", &inventario[i].precio);
+        
+        printf("Existencia: ");
+        scanf("%d", &inventario[i].existencia);
+        
+        total_valor += (inventario[i].precio * inventario[i].existencia);
+    }
+    
+    /* Reporte final */
+    printf("\n--- Reporte de Inventario ---");
+    for (i = 0; i < n; i++)
+    {
+        printf("\n%d \t %-20s \t Cantidad: %d \t Valor: %.2f", 
+               inventario[i].clave, 
+               inventario[i].descripcion, 
+               inventario[i].existencia, 
+               (inventario[i].precio * inventario[i].existencia));
+    }
+    printf("\n\nValor total del inventario: $%.2f", total_valor);
+}
